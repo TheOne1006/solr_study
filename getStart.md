@@ -162,16 +162,121 @@ http://localhost:8983/solr/gettingstarted/select?q=video
 ![](getetingStarted/sample-client-app-arch.png)
 
 
+例如上图, 一个在线的应用商店, 提供一个用户界面, 购物车,以及一个用户支付通道, 而库存管理将允许商店员工编辑产品信息.
+产品的元数据存在某种数据库中, 以及solr 中.  
+
+slor 可以轻松添加几个步骤,即可完成在线商店搜索:  
+
+1. 定义一个模型, 该模式告诉 Solr 它将要建立索引的文档的内容, 在'在线商店'案例中,
+    该模式将定义产品的 name, 描述, 价格, 制造商, 等.
+    Solr的模式是强大和灵活的,并允许你定制Solr的行为到你的应用程序,
+    查看 [Documents, Fields, and Schema Design](https://cwiki.apache.org/confluence/display/solr/Documents%2C+Fields%2C+and+Schema+Design) 详情
+2. 部署 Solr
+3. 您的用户将搜索的Feed Solr文档
+4. 在应用程序中暴露搜索功能
+
+因为 Solr 是一个基于开放标准,它是高度可扩展的,
+solr 查询是 restful ,
+这意味着,实际上,一个查询是一个简单的HTTP请求URL，响应是一个结构化文档.
+主要是XML，但它也可以是JSON，CSV或一些其他格式,
+这意味着各种各样的客户端都将能够使用Solr,从其他Web应用程序到浏览器客户端,以及各种应用程序.
+
+任何能够HTTP的平台都可以与Solr通信。
+查看 [Client APIs](https://cwiki.apache.org/confluence/display/solr/Client+APIs) client API 详情
+
+
+Solr 是一个基于 Apache Lucene 项目, 一个高性能,多功能的搜索引擎,
+Solr 支持最简单的关键字搜索到多个字段和分面搜索结果上的复杂查询.
+[Searching](https://cwiki.apache.org/confluence/display/solr/Searching)有关于搜索和查询的更多信息。
+
+## 更进一步
+
+你已经了解了一下 Solr 的模式, 本节介绍Solr的主目录和其他配置选项。  
+
+当Solr在应用程序服务器中运行时, 它需要访问主目录.
+主目录包含重要的配置信息, 是Solr存储其索引的位置.
+当在独立模式下运行Solr时, 和在SolrCloud模式下运行时, 主目录的布局看起来有点不同
+
+Solr主目录的关键部分如下所示:
+如 `solr/example/techproducts/solr`
+
+```
+# Standalone Mode
+<solr-home-directory>/
+   solr.xml
+   core_name1/
+      core.properties
+      conf/
+         solrconfig.xml
+         managed-schema
+      data/
+   core_name2/
+      core.properties
+      conf/
+         solrconfig.xml
+         managed-schema
+      data/
+
+# SolrCloud Mode
+<solr-home-directory>/
+   solr.xml
+   core_name1/
+      core.properties
+      data/
+   core_name2/
+      core.properties
+      data/
+```
+
+你也许还看到其他文件,但是你需要知道:  
+
+* solr.xml 指定Solr服务器实例的配置选项, 更多详情 [Solr Cores and solr.xml](https://cwiki.apache.org/confluence/display/solr/Solr+Cores+and+solr.xml)
+* Per Solr Core:
+    * core.properties 定义每个核心的特定属性，例如其名称, 核心所属的集合,模式的位置,和其他参数.有关core.properties的更多详细信息[Defining core.properties](https://cwiki.apache.org/confluence/display/solr/Defining+core.properties)
+    * solrconfig.xml 控制高级行为. 例如, 您可以为数据目录指定备用位置. 有关solrconfig.xml的详细信息 [Configuring solrconfig.xml](https://cwiki.apache.org/confluence/display/solr/Configuring+solrconfig.xml)
+    * 托管模式（或者schema.xml中代替） 描述您将要求Solr索引的文档。模式将文档定义为字段的集合 您可以定义字段类型和字段本身, 字段类型定义很强大，包括有关Solr如何处理传入字段值和查询值的信息。
+    有关Solr模式的更多信息, 查看详情
+    * data/ 包含低级索引文件的目录
+
+请注意，SolrCloud示例不包括每个Solr Core的conf目录（因此没有solrconfig.xml或Schema文件）,
+这是因为通常在conf目录中找到的配置文件存储在ZooKeeper中，因此它们可以在集群中传播。
+
+如果您使用SolrCloud与嵌入的ZooKeeper实例, 你也许需要查看 zoo.cfg 和 zoo.data 它们是ZooKeeper配置和数据文件.
+
+但是，如果您运行的是自己的ZooKeeper集合，您将提供您自己的ZooKeeper配置文件，当您启动它和在Solr的副本将不使用.
+有关ZooKeeper和SolrCloud的详细信息，请参阅SolrCloud部分。
 
 
 
 
+## Solr控制脚本参考
+
+我们已经知道 `bin/solr` 允许 启动和停止 Solr, 创建/或删除 collections 或 cores, 对ZooKeeper进行操作，检查Solr和配置的分片的状态.
+你可以在 `bin/` 目录下找到这些脚本,Solr更容易使用，`bin/solr` 脚本使得通过提供简单的命令和选项来快速实现共同目标。
+
+下面的标题对应于可用的命令. 对于每个命令, 将使用示例描述可用的选项.
+
+在Solr参考指南中提供了更多使用 `bin/solr` 的例子. 但特别是在运行Solr和SolrCloud入门的部分
 
 
-
-
-
-
+* 启动和关闭
+    * 启动
+    * 关闭
+* 系统信息
+    * 版本
+    * 状态
+    * 健康检查
+* Collections and Cores
+    * 创建
+    * 删除
+* ZooKeeper操作
+    * 上传配置集
+    * 下载配置集
+    * 在本地文件和ZooKeeper znode之间复制
+    * 从ZooKeeper中删除znode
+    * 将一个ZooKeeper znode移动到另一个（重命名）
+    * 查看 zooKeeper 以及相关节点
+    * 创建一个 z 节点
 
 
 
